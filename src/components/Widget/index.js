@@ -54,6 +54,9 @@ class Widget extends Component {
 
 
   componentDidMount() {
+      
+    console.log("mount")
+    
     const { connectOn, autoClearCache, storage, dispatch, defaultHighlightAnimation } = this.props;
 
     // add the default highlight css to the document
@@ -87,7 +90,7 @@ class Widget extends Component {
   componentDidUpdate() {
     const { isChatOpen, dispatch, embedded, initialized } = this.props;
     
-    console.log("test");
+    console.log("update");
 
     if (isChatOpen) {
       if (!initialized) {
@@ -103,6 +106,9 @@ class Widget extends Component {
   }
 
   componentWillUnmount() {
+      
+    console.log("unmount")
+    
     const { socket } = this.props;
 
     if (socket) {
