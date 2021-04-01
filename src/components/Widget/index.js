@@ -55,7 +55,7 @@ class Widget extends Component {
 
   componentDidMount() {
       
-    console.log("mount")
+    console.log("mount");
     
     const { connectOn, autoClearCache, storage, dispatch, defaultHighlightAnimation } = this.props;
 
@@ -107,7 +107,7 @@ class Widget extends Component {
 
   componentWillUnmount() {
       
-    console.log("unmount")
+    console.log("unmount");
     
     const { socket } = this.props;
 
