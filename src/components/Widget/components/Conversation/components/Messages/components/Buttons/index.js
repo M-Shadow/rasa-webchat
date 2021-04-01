@@ -43,20 +43,16 @@ class Buttons extends PureComponent {
     const { isLast, linkTarget, separateButtons
     } = this.props;
 
-    console.log(message)
-    return (
-      <div>
-        {message.get("text") !== "null" && <Message message={message} />}
-
     const { userTextColor, userBackgroundColor } = this.context;
     const buttonStyle = {
       color: userTextColor,
       backgroundColor: userBackgroundColor,
       borderColor: userBackgroundColor
     };
+    
     return (
       <div>
-        <Message message={message} />
+        {message.get("text") !== "null" && <Message message={message} />}
         {separateButtons && (<div className="rw-separator" />) }
         {(isLast || persit) && (
           <div className="rw-replies">
