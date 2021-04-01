@@ -33,7 +33,7 @@ import {
   evalUrl,
   setCustomCss
 } from 'actions';
-
+import { safeQuerySelectorAll } from 'utils/dom';
 import { SESSION_NAME, NEXT_MESSAGE } from 'constants';
 import { isVideo, isImage, isButtons, isText, isCarousel } from './msgProcessor';
 import WidgetLayout from './layout';
@@ -47,6 +47,7 @@ class Widget extends Component {
     this.messageDelayTimeout = null;
     this.onGoingMessageDelay = false;
     this.sendMessage = this.sendMessage.bind(this);
+    this.getSessionId = this.getSessionId.bind(this);
     this.intervalId = null;
     this.eventListenerCleaner = () => { };
   }
@@ -274,7 +275,7 @@ class Widget extends Component {
     const { domHighlight, defaultHighlightClassname } = this.props;
     const domHighlightJS = domHighlight.toJS() || {};
     if (domHighlightJS.selector) {
-      const elements = document.querySelectorAll(domHighlightJS.selector);
+      const elements = safeQuerySelectorAll(domHighlightJS.selector);
       elements.forEach((element) => {
         switch (domHighlightJS.style) {
           case 'custom':
@@ -298,7 +299,7 @@ class Widget extends Component {
     const { domHighlight, defaultHighlightCss, defaultHighlightClassname } = this.props;
     const domHighlightJS = domHighlight.toJS() || {};
     if (domHighlightJS.selector) {
-      const elements = document.querySelectorAll(domHighlightJS.selector);
+      const elements = safeQuerySelectorAll(domHighlightJS.selector);
       elements.forEach((element) => {
         switch (domHighlightJS.style) {
           case 'custom':
@@ -599,6 +600,7 @@ class Widget extends Component {
         embedded={this.props.embedded}
         params={this.props.params}
         openLauncherImage={this.props.openLauncherImage}
+        inputTextFieldHint={this.props.inputTextFieldHint}
         closeImage={this.props.closeImage}
         customComponent={this.props.customComponent}
         displayUnreadCount={this.props.displayUnreadCount}
@@ -644,6 +646,7 @@ Widget.propTypes = {
   initialized: PropTypes.bool,
   openLauncherImage: PropTypes.string,
   closeImage: PropTypes.string,
+  inputTextFieldHint: PropTypes.string,
   customComponent: PropTypes.func,
   displayUnreadCount: PropTypes.bool,
   showMessageDate: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
@@ -668,6 +671,7 @@ Widget.defaultProps = {
   autoClearCache: false,
   displayUnreadCount: false,
   tooltipPayload: null,
+  inputTextFieldHint: 'Type a message...',
   oldUrl: '',
   disableTooltips: false,
   defaultHighlightClassname: '',

@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -10,14 +11,13 @@ import 'slick-carousel/slick/slick-theme.css';
 
 import { MESSAGES_TYPES } from 'constants';
 import { Image, Message, Buttons } from 'messagesComponents';
-import { showTooltip as showTooltipAction } from 'actions';
+import { showTooltip as showTooltipAction, emitUserMessage} from 'actions';
 import { onRemove } from 'utils/dom';
-
 import openLauncher from 'assets/launcher_button.svg';
 import closeIcon from 'assets/clear-button-grey.svg';
 import close from 'assets/clear-button.svg';
 import Badge from './components/Badge';
-
+import { safeQuerySelectorAll } from 'utils/dom';
 import './style.scss';
 import ThemeContext from '../../ThemeContext';
 
@@ -34,7 +34,8 @@ const Launcher = ({
   lastMessages,
   closeTooltip,
   lastUserMessage,
-  domHighlight
+  domHighlight,
+  sendPayload
 }) => {
   const { mainColor, assistBackgoundColor } = useContext(ThemeContext);
 
@@ -42,7 +43,7 @@ const Launcher = ({
 
   useEffect(() => {
     const setReference = (selector) => {
-      const reference = document.querySelectorAll(selector);
+      const reference = safeQuerySelectorAll(selector)
       if (reference && reference.length === 1) {
         onRemove(reference[0], () => setReferenceElement(null));
         setReferenceElement(reference[0]);
@@ -93,7 +94,7 @@ const Launcher = ({
   if (isChatOpen) className.push('rw-hide-sm');
   if (fullScreenMode && isChatOpen) className.push('rw-full-screen rw-hide');
 
-  const getComponentToRender = (message) => {
+  const getComponentToRender = (message, buttonSeparator = false) => {
     const ComponentToRender = (() => {
       switch (message.get('type')) {
         case MESSAGES_TYPES.TEXT: {
@@ -109,9 +110,39 @@ const Launcher = ({
           return null;
       }
     })();
-    if (ComponentToRender) { return <ComponentToRender id={-1} params={{}} message={message} isLast />; }
+    if (ComponentToRender) { return <ComponentToRender separateButtons={buttonSeparator} id={-1} params={{}} message={message} isLast />; }
     toggle(); // open the chat if the tooltip do not know how to display the compoment
   };
+
+
+  const renderSequenceTooltip = lastMessagesSeq => (
+    <div className="rw-slider-safe-zone" onClick={e => e.stopPropagation()}>
+      <Slider {...sliderSettings}>
+        {lastMessagesSeq.map(message => (
+          // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+          <div
+            className="rw-tooltip-response"
+            onMouseDown={(event) => {
+              dragStatus.current.x = event.clientX;
+              dragStatus.current.y = event.clientY;
+            }}
+            onMouseUp={(event) => {
+              if (
+                Math.abs(dragStatus.current.x - event.clientX) +
+                Math.abs(dragStatus.current.y - event.clientY) <
+              15
+              ) {
+                toggle();
+              }
+            }}
+          >
+            {getComponentToRender(message)}
+          </div>
+        ))}
+      </Slider>
+    </div>
+  )
+    ;
 
   const renderTooltipContent = () => (
     <React.Fragment>
@@ -121,38 +152,22 @@ const Launcher = ({
             /* stop the propagation because the popup is also a button
             otherwise it would open the webchat when closing the tooltip */
             e.stopPropagation();
+            
+            const payload = domHighlight.get('tooltipClose')
+              if(domHighlight && payload){
+                sendPayload(`/${payload}`)
+              }
             closeTooltip();
           }}
         >
           <img src={closeIcon} alt="close" />
         </button>
       </div>
-      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-      <div className="rw-slider-safe-zone" onClick={e => e.stopPropagation()}>
-        <Slider {...sliderSettings}>
-          {lastMessages.map(message => (
-            // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-            <div
-              className="rw-tooltip-response"
-              onMouseDown={(event) => {
-                dragStatus.current.x = event.clientX;
-                dragStatus.current.y = event.clientY;
-              }}
-              onMouseUp={(event) => {
-                if (
-                  Math.abs(dragStatus.current.x - event.clientX) +
-                    Math.abs(dragStatus.current.y - event.clientY) <
-                  15
-                ) {
-                  toggle();
-                }
-              }}
-            >
-              {getComponentToRender(message)}
-            </div>
-          ))}
-        </Slider>
-      </div>
+      { lastMessages.length === 1 ? (<div
+        onMouseUp={() => toggle()}
+      >
+        {getComponentToRender(lastMessages[0], true)}
+      </div>) : renderSequenceTooltip(lastMessages) }
     </React.Fragment>
   );
 
@@ -252,7 +267,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  closeTooltip: () => dispatch(showTooltipAction(false))
+  closeTooltip: () => dispatch(showTooltipAction(false)),
+  sendPayload: (payload) => dispatch(emitUserMessage(payload))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Launcher);

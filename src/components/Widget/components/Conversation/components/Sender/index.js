@@ -167,8 +167,7 @@ class Sender extends React.Component {
 }
 
 const mapStateToProps = state => ({
-    inputTextFieldHint: state.behavior.get('inputTextFieldHint'),
-    userInput: state.metadata.get('userInput'),
+    userInput: state.metadata.get('userInput')
 });
 
 Sender.propTypes = {

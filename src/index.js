@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useRef } from 'react';
 
 import PropTypes from 'prop-types';
 import { Provider } from 'react-redux';
@@ -8,7 +8,6 @@ import { initStore } from '../src/store/store';
 import socket from './socket';
 import ThemeContext from '../src/components/Widget/ThemeContext';
 // eslint-disable-next-line import/no-mutable-exports
-export let store = null;
 
 const ConnectedWidget = forwardRef((props, ref) => {
   class Socket {
@@ -82,31 +81,40 @@ const ConnectedWidget = forwardRef((props, ref) => {
     }
   }
 
-  const sock = new Socket(
-    props.socketUrl,
-    props.customData,
-    props.socketPath,
-    props.protocol,
-    props.protocolOptions,
-    props.onSocketEvent
-  );
+  const instanceSocket = useRef({});
+  const store = useRef(null);
 
+  if (!instanceSocket.current.url && !(store && store.current && store.current.socketRef)) {
+    instanceSocket.current = new Socket(
+      props.socketUrl,
+      props.customData,
+      props.socketPath,
+      props.protocol,
+      props.protocolOptions,
+      props.onSocketEvent
+    );
+  }
+
+  if (!instanceSocket.current.url && store && store.current && store.current.socketRef) {
+    instanceSocket.current = store.socket;
+  }
 
   const storage =
     props.params.storage === 'session' ? sessionStorage : localStorage;
-  if (!store || sock.marker !== store.socketRef) {
-    store = initStore(
-      props.inputTextFieldHint,
+
+  if (!store || !store.current) {
+    store.current = initStore(
       props.connectingText,
-      sock,
+      instanceSocket.current,
       storage,
       props.docViewer,
       props.onWidgetEvent
     );
-    store.socketRef = sock.marker;
+    store.current.socketRef = instanceSocket.current.marker;
+    store.current.socket = instanceSocket.current;
   }
   return (
-    <Provider store={store}>
+    <Provider store={store.current}>
       <ThemeContext.Provider
         value={{ mainColor: props.mainColor,
           conversationBackgroundColor: props.conversationBackgroundColor,
@@ -133,11 +141,12 @@ const ConnectedWidget = forwardRef((props, ref) => {
           embedded={props.embedded}
           params={props.params}
           storage={storage}
+          inputTextFieldHint={props.inputTextFieldHint}
           openLauncherImage={props.openLauncherImage}
           closeImage={props.closeImage}
           customComponent={props.customComponent}
           displayUnreadCount={props.displayUnreadCount}
-          socket={sock}
+          socket={instanceSocket.current}
           showMessageDate={props.showMessageDate}
           customMessageDelay={props.customMessageDelay}
           tooltipPayload={props.tooltipPayload}

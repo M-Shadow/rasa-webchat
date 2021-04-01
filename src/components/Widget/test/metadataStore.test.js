@@ -8,7 +8,7 @@ import { initStore } from '../../../store/store';
 import LocalStorageMock from '../../../../mocks/localStorageMock';
 
 const localStorage = new LocalStorageMock();
-const store = initStore('dummy', 'dummy', 'dummy', localStorage);
+const store = initStore('dummy', 'dummy', localStorage);
 jest.useFakeTimers();
 
 describe('Messages metadata affect store', () => {
@@ -131,7 +131,8 @@ describe('Messages metadata affect store', () => {
       metadata: {
         domHighlight: {
           selector: '.test',
-          style: 'color: red'
+          style: 'color: red',
+          tooltipClose: 'dummy'
         }
       }
     };
@@ -143,7 +144,8 @@ describe('Messages metadata affect store', () => {
     jest.runOnlyPendingTimers();
     expect(store.getState().metadata.get('domHighlight').toJS()).toEqual({
       selector: '.test',
-      style: 'color: red'
+      style: 'color: red',
+      tooltipClose: 'dummy'
     });
     // clear the dom highlight store so the next test does not try to remove it from the DOM
     store.dispatch({ type: 'SET_DOM_HIGHLIGHT',

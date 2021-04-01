@@ -4,10 +4,10 @@
     <img alt="npm" src="https://img.shields.io/npm/v/rasa-webchat.svg">
 </a>
 <a href='https://github.com/botfront/botfront/blob/master/LICENSE'>
-    <img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg">
+    <img alt="License" src="https://img.shields.io/github/license/botfront/rasa-webchat">
 </a>
 <a href='https://spectrum.chat/botfront'>
-    <img alt="License" src="https://withspectrum.github.io/badge/badge.svg">
+    <img alt="Spectrum link" src="https://withspectrum.github.io/badge/badge.svg">
 </a>
 </p>
 <h1 align="center">Rasa Webchat 💬</h1>
@@ -45,27 +45,31 @@
 
 In your `<body/>`:
 ```html
-<div id="webchat"></div>
-<script src="https://cdn.jsdelivr.net/npm/rasa-webchat/lib/index.min.js"></script>
-// you can add a version tag if you need, e.g for version 0.11.5 https://cdn.jsdelivr.net/npm/rasa-webchat@0.11.5/lib/index.min.js
-<script>
-  WebChat.default.init({
-    selector: "#webchat",
-    initPayload: "/get_started",
-    customData: {"language": "en"}, // arbitrary custom data. Stay minimal as this will be added to the socket
-    socketUrl: "http://localhost:5500",
-    socketPath: "/socket.io/",
-    title: "Title",
-    subtitle: "Subtitle",
-    params: {"storage": "session"} // can be set to "local"  or "session". details in storage section.
-  })
+<script>!(function () {
+  let e = document.createElement("script"),
+    t = document.head || document.getElementsByTagName("head")[0];
+  (e.src =
+    "https://cdn.jsdelivr.net/npm/rasa-webchat/lib/index.js"),
+    (e.async = !0),
+    (e.onload = () => {
+      window.WebChat.default(
+        {
+          customData: { language: "en" },
+          socketUrl: "https://bf-botfront.development.agents.botfront.cloud",
+          // add other props here
+        },
+        null
+      );
+    }),
+    t.insertBefore(e, t.firstChild);
+})();
 </script>
 ```
 
-About images: `width` and `height` define the size in pixels that images in messages are crop-scaled to. If not present, the image will scale to the maximum width of the container and the image.
+⚠️ We recommend adding a version tag to prevent breaking changes from major versions, e.g for version 1.0.0 https://cdn.jsdelivr.net/npm/rasa-webchat@1.0.0/lib/index.js,
+however this will not work with versions below 1.0.0. If you do not specify a version, you will get served the latest available version of the rasa-webchat.
 
-It is recommended to use a particular version (i.e. "webchat-<version>.js") however the file "webchat-latest.js"
-is also available and is updated continuously with the latest version.
+About images: `width` and `height` define the size in pixels that images in messages are crop-scaled to. If not present, the image will scale to the maximum width of the container and the image.
 
 ### As a React component
 
@@ -77,7 +81,7 @@ npm install rasa-webchat
 Then:
 
 ```javascript
-import { Widget } from 'rasa-webchat';
+import Widget from 'rasa-webchat';
 
 function CustomWidget = () => {
   return (
@@ -117,8 +121,8 @@ set to `true` if you don't want to see the launcher.
 | `showMessageDate`      | `false`            | Show message date. Can be overriden with a function: `(timestamp, message) => return 'my custom date'`                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `customMessageDelay`   | See below          | This prop is a function, the function take a message string as an argument. The defined function will be called everytime a message is received and the returned value will be used as a milliseconds delay before displaying a new message.                                                                                                                                                                                                                                                                                 |
 | `params`               | See below          | Essentially used to customize the image size, also used to change storage options.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| `storage`              | `"local"`          | Specifies the storage location of the conversation state in the browser. `"session"` defines the state to be stored in the session storage. The session storage persists on reload of the page, and is cleared after the browser or tab is closed, or when `sessionStorage.clear()`is called. `"local"` defines the state to be stored in the local stoage. The local storage persists after the the browser is closed, and is cleared when the cookies of the browser are cleared, or when `localStorage.clear()`is called. ⚠️ This is not a prop, it has to be passed inside the params object above. |
-| `customComponent`      | `null`             | Custom component to be used with custom responses. E.g.: `customComponent={ (messageData) => (<div>Custom React component</div>)` }|
+| `storage`              | `"local"`          | ⚠️ This is not a prop, it has to be passed inside the params object above. <br> Specifies the storage location of the conversation state in the browser. `"session"` defines the state to be stored in the session storage. The session storage persists on reload of the page, and is cleared after the browser or tab is closed, or when `sessionStorage.clear()`is called. `"local"` defines the state to be stored in the local stoage. The local storage persists after the the browser is closed, and is cleared when the cookies of the browser are cleared, or when `localStorage.clear()`is called. |
+| `customComponent`      | `null`             | Custom component to be used with custom responses. E.g.: `customComponent={ (messageData) => (<div>Custom React component</div>)}`. Please note that this can only be used if you call the webchat from a React application as you can't write a component in pure Javscript. |
 | `onWidgetEvent`        | `{}`             | call custom code on a specific widget event ( `onChatOpen`, `onChatClose`, `onChatHidden`, are available for now ), add a function to the desired object property in the props to have it react to the event. |
 
 ### Additional Examples
@@ -166,19 +170,27 @@ Text messages received when the widget is closed will be shown as a tooltip.
 
 When reconnecting to an existing chat session, the bot will send a message contained in the localStorage key specified by the `NEXT_MESSAGE` constant. The message should be stringified JSON with a `message` property describing the message and an `expiry` property set to a UNIX timestamp in milliseconds after which this message should not be sent. This is useful if you would like your bot to be able to offer your user to navigate around the site.
 
+#### Sending a payload from your React app
 
-## API
+```jsx
+function myComponent() {
+    const webchatRef = useRef(null);
+    
+    // triggered when something happens in your app
+    function callback() {
+        if (webchatRef.current && webchatRef.current.sendMessage) {
+            webchatRef.current.sendMessage('/myIntent{"entityName":"value"}');
+        }
+    }
+    
+    return <RasaWebchat
+        ref={webchatRef}
+    />;
+}
+```
 
-| Method                                   | Description                                                                                                                                                              |
-|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `WebChat.toggle()`                       | Toggle the open/close state of the chat window, send initPayload if webchat is not initialized and is toggled open                                                       |
-| `WebChat.open()`                         | Open the chat window, send initPayload if webchat is not initialized                                                                                                     |
-| `WebChat.close()`                        | Close the chat window                                                                                                                                                    |
-| `WebChat.isOpen()`                       | Get the open/closed state of the widget                                                                                                                                  |
-| `WebChat.show()`                         | Show the chat widget, send initPayload if the chat is in open state and not initialized                                                                                  |
-| `WebChat.hide()`                         | Hide the chat widget                                                                                                                                                     |
-| `WebChat.isVisible()`                    | Get the shown/hidden state of the widget                                                                                                                                 |
-| `WebChat.send(payload, text: optionnal)` | send a payload (`/intent{"entity":"value"}` to rasa. If `text` is specified, it will be displayed as a user message. If not specified, no user message will be displayed |                                                                       |
+The payload can be any message that the user would normally send, but if you want to force an intent and maybe some entities, you can use that format
+`/myIntent{"entity1":"value1","entity2":"value2"}`
 
 ### Backends
 
@@ -254,3 +266,21 @@ hierarchy:
 [@dliuproduction](https://github.com/dliuproduction)
 [@MatthieuJnon](https://github.com/MatthieuJnon)
 [@mofortin](https://github.com/mofortin)
+[@GuillaumeTech](https://github.com/GuillaumeTech)
+                                 
+<br/>
+<h2 align="center">License</h2>
+
+Copyright (C) 2021 Dialogue Technologies Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.(C) 2021 Dialogue Technologies Inc. All rights reserved.
