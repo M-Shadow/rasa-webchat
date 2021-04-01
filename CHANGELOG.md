@@ -2,6 +2,54 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0](https://https///compare/v0.11.12...v1.0.0) (2021-02-01)
+
+### [0.11.12](https://https///compare/v0.11.11...v0.11.12) (2021-01-19)
+
+
+### Features
+
+* expose getSessionId ([c8cbda7](https://https///commit/c8cbda78ec9b746f2697aa8c279c84f1b260fd1f))
+
+### [0.11.11](https://https///compare/v0.11.10...v0.11.11) (2020-10-21)
+
+### [0.11.10](https://https///compare/v0.11.9...v0.11.10) (2020-10-16)
+
+
+### Features
+
+* image size in markdown ([990f4bb](https://https///commit/990f4bb113da8ae1c29528c9b48a279d5efc8393))
+
+### [0.11.9](https://https///compare/v0.11.8...v0.11.9) (2020-10-14)
+
+
+### Bug Fixes
+
+* custom responses ([ae7072c](https://https///commit/ae7072c0dca010dc719d8ecb067726fe8e0e7f9e))
+* image size in markdown ([cee6286](https://https///commit/cee62866b3e61806d389d1728b32864da8f02554))
+
+### [0.11.8](https://https///compare/v0.11.7...v0.11.8) (2020-09-28)
+
+
+### Features
+
+* possibility to send a payload on tooltip close ([38cf679](https://https///commit/38cf67976ba634ad2a6097c6f684ff105ede04e6))
+
+### [0.11.7](https://https///compare/v0.11.6...v0.11.7) (2020-09-16)
+
+
+### Bug Fixes
+
+* colors on buttons using color props ([dbfebe6](https://https///commit/dbfebe63699f67c9baf5551ca0aa588ca4df76d6))
+
+### [0.11.6](https://https///compare/v0.11.5...v0.11.6) (2020-08-27)
+
+
+### Bug Fixes
+
+* code formatting on readme ([2a4f94c](https://https///commit/2a4f94cde3137aff1f73080ce296eadafed8bc25))
+* reload in edge cases ([db6d3d1](https://https///commit/db6d3d140db90e1e417b52c264b0a524489c4a8d))
+
 ### [0.11.5](https://https///compare/v0.11.4...v0.11.5) (2020-06-24)
 
 

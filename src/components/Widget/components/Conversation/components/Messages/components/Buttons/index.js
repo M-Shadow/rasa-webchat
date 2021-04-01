@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { PROP_TYPES } from 'constants';
-import { addUserMessage, emitUserMessage, setButtons, toggleInputDisabled, changeInputFieldHint } from 'actions';
+import { addUserMessage, emitUserMessage, setButtons, toggleInputDisabled } from 'actions';
 import Message from '../Message/index';
 
 import './styles.scss';
@@ -25,7 +25,6 @@ class Buttons extends PureComponent {
     const chosenReply = getChosenReply(id);
     if (!chosenReply && !inputState) {
       // this.props.toggleInputDisabled();
-      // this.props.changeInputFieldHint(hint);
     }
   }
 
@@ -38,17 +37,27 @@ class Buttons extends PureComponent {
     const payload = reply.get('payload');
     const title = reply.get('title');
     chooseReply(payload, title, id);
-    // this.props.changeInputFieldHint('Type a message...');
   }
 
   renderButtons(message, buttons, persit) {
-    const { isLast, linkTarget
+    const { isLast, linkTarget, separateButtons
     } = this.props;
-    const { mainColor } = this.context;
+
     console.log(message)
     return (
       <div>
         {message.get("text") !== "null" && <Message message={message} />}
+
+    const { userTextColor, userBackgroundColor } = this.context;
+    const buttonStyle = {
+      color: userTextColor,
+      backgroundColor: userBackgroundColor,
+      borderColor: userBackgroundColor
+    };
+    return (
+      <div>
+        <Message message={message} />
+        {separateButtons && (<div className="rw-separator" />) }
         {(isLast || persit) && (
           <div className="rw-replies">
             <div className="reply-prompt">אולי יעניין אותר גם על:</div>
@@ -61,7 +70,7 @@ class Buttons extends PureComponent {
                     target={linkTarget || '_blank'}
                     rel="noopener noreferrer"
                     className={'rw-reply'}
-                    style={{ borderColor: mainColor, color: mainColor }}
+                    style={buttonStyle}
                     onMouseUp={e => e.stopPropagation()}
                   >
                     {reply.get('title')}
@@ -74,7 +83,7 @@ class Buttons extends PureComponent {
                   key={index}
                   className={'rw-reply'}
                   onClick={(e) => { e.stopPropagation(); this.handleClick(reply); }}
-                  style={{ borderColor: mainColor, color: mainColor }}
+                  style={buttonStyle}
                   onMouseUp={e => e.stopPropagation()}
                 >
                   {reply.get('title')}
@@ -119,7 +128,6 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   toggleInputDisabled: () => dispatch(toggleInputDisabled()),
-  changeInputFieldHint: hint => dispatch(changeInputFieldHint(hint)),
   chooseReply: (payload, title, id) => {
     dispatch(setButtons(id, title));
     dispatch(addUserMessage(title));

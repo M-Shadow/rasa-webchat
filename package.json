@@ -1,12 +1,12 @@
 {
   "name": "rasa-webchat",
-  "version": "0.11.5",
+  "version": "1.0.0",
   "description": "Chat web widget for React apps and Rasa Core chatbots",
   "module": "module/index.js",
   "main": "lib/index.js",
-  "repository": "git@https://github.com/mrbot-ai/rasa-webchat.git",
-  "author": "Mr. Bot <human@mrbot.ai>",
-  "license": "MIT",
+  "repository": "git@https://github.com/botfront/rasa-webchat.git",
+  "author": "",
+  "license": "Apache-2.0",
   "scripts": {
     "dev": "webpack-dev-server --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js -p",
@@ -37,7 +37,8 @@
     "slick-carousel": "^1.8.1",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.2.0",
-    "sockjs-client": "^1.4.0"
+    "sockjs-client": "^1.4.0",
+    "object-hash": "^1.1.5"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
@@ -76,7 +77,7 @@
     "react-dom": "^16.12.0",
     "redux-mock-store": "^1.5.4",
     "sass-loader": "^6.0.7",
-    "standard-version": "^7.0.0",
+    "standard-version": "^9.0.0",
     "string-replace-loader": "^2.3.0",
     "style-loader": "^0.18.2",
     "url-loader": "^0.5.9",
