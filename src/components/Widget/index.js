@@ -86,6 +86,8 @@ class Widget extends Component {
 
   componentDidUpdate() {
     const { isChatOpen, dispatch, embedded, initialized } = this.props;
+    
+    console.log("test");
 
     if (isChatOpen) {
       if (!initialized) {
